@@ -221,7 +221,7 @@ public function smarty() {
 
   // see if we need to set up the smarty object for this instance
   if ( $this->_smarty===NULL ) {
-    // set time for benchmarking
+      // set time for benchmarking
     $time = microtime(TRUE);
     $this->_smarty = clone self::smarty_prototype();
     $time = microtime(TRUE) - $time;
@@ -238,6 +238,7 @@ public function smarty() {
  * @return   Smarty prototype object
  */
 public static function smarty_prototype() {
+  $token = Kohana::$profiling ? Profiler::start('smarty', 'load smarty') : false;
   // set time for benchmarking
   $time = microtime(TRUE);
   // see if we need to set up the prototype smarty object
@@ -256,11 +257,14 @@ public static function smarty_prototype() {
     }
     require_once($file);
 
+    $file = Kohana::find_file('vendor', 'smarty/libs/SmartyDocType.class');
+    require_once($file);
+
     // save the location in case we have more than one Smarty version around
     self::$_smarty_path = realpath(dirname($file)).DIRECTORY_SEPARATOR;
 
     // instantiate the prototype Smarty object
-    $smarty = new Smarty;
+    $smarty = new SmartyDocType(new Smarty);
     self::$_smarty_prototype = $smarty;
 
     // set up the prototype with options from config file
@@ -315,6 +319,7 @@ public static function smarty_prototype() {
     // set timing for benchmark
     self::$_init_time = microtime(TRUE) - $time;
   }
+  $token ? Profiler::stop($token) : null;
   return self::$_smarty_prototype;
 }
 
@@ -373,7 +378,12 @@ public function render($file = NULL) {
     throw new Kohana_View_Exception('You must set the file to use within your view before rendering');
   }
 
-  return $this->_smarty->fetch($this->_file);
+  $token = Kohana::$profiling ? Profiler::start('smarty', 'rendering '.basename($this->_file)) : false;
+
+  $output =  $this->_smarty->fetchDoc($this->_file);
+
+  $token ? Profiler::stop($token) : null;
+  return $output;
 }
 
 /**
