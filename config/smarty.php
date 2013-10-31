@@ -62,6 +62,8 @@ return array (
 
     // If you want to use smarty config files, put them in this place
     'config_dir'      =>  APPPATH.'smarty_config',
+
+    'escape_html'     => FALSE,
     ),
 
 );
