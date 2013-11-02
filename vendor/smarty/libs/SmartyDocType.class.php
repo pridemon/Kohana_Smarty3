@@ -75,11 +75,6 @@ class SmartyDocType extends Smarty
         , 'optional' => array('content', 'http_equiv', 'scheme', 'dir', 'lang', 'xml__lang')
         , 'defaults' => array('content'=>'')
         )
-    , 'og' => array(
-          'renameto' => 'property'
-        , 'optional' => array('content')
-        , 'defaults' => array('content'=>'')
-        )
     , 'link' => array(
           'renameto' => 'href'
         , 'optional' => array('rel', 'id', 'class', 'dir', 'lang', 'style', 'xml__lang', 'type', 'target', 'rev', 'media', 'hreflang', 'charset', 'title', 'comment')
@@ -97,7 +92,7 @@ class SmartyDocType extends Smarty
         )
     , 'head' => array(
           'renameto' => 'xml:lang'
-        , 'optional' => array('profile', 'dir', 'xml__lang', 'lang', 'prefix')
+        , 'optional' => array('profile', 'dir', 'xml__lang', 'lang')
         , 'defaults' => array()
         )
     , 'stylesheet' => array(
@@ -369,10 +364,7 @@ class SmartyDocType extends Smarty
 
     public function fetch($template = null, $cache_id = null, $compile_id = null, $parent = null, $display = false, $merge_tpl_vars = true, $no_output_filter = false)
     {
-        $outputfilter_loaded = false;
-        if (isset($this->registered_filters['output'])) {
-            $outputfilter_loaded = array_key_exists('smarty_outputfilter_SmartyDoc', $this->registered_filters['output']);
-        }
+        $outputfilter_loaded = array_key_exists('smarty_outputfilter_SmartyDoc', $this->_plugins['outputfilter']);
         if ($outputfilter_loaded) {
         	$this->unregisterFilter('output', array(&$this, 'smarty_outputfilter_SmartyDoc'));
           //  $this->unregister->outputFilter('smarty_outputfilter_SmartyDoc');
@@ -578,6 +570,7 @@ class SmartyDocType extends Smarty
             $indent     = $smarty->getIndent();
             $_doc_info  = $smarty->doc_info;
             $doc_source = '';
+            $doc_end = "";
             
             // process modules
             $module_content = array('head_pre'=>'', 'head_post'=>'', 'body_pre'=>'', 'body_post'=>'');
@@ -698,18 +691,6 @@ class SmartyDocType extends Smarty
                         }
                     }
                 $doc_source .= " />\n";
-                }
-            }
-
-            if (isset($_doc_info['og'])) {
-                foreach ($_doc_info['og'] as $meta) {
-                    $doc_source .= "{$indent}<meta";
-                    foreach ($meta as $a=>$v) {
-                        if (!empty($v)) {
-                            $doc_source .= " {$a}=\"{$v}\"";
-                        }
-                    }
-                    $doc_source .= " />\n";
                 }
             }
 
@@ -846,7 +827,7 @@ class SmartyDocType extends Smarty
                    	// условное комментирование
                     $postfix = "";
                     if (isset($link['comment'])) {
-                    	$doc_source .= "{$indent}<!--[if ".$link['comment']."]>\n";	
+                    	$doc_end .= "{$indent}<!--[if ".$link['comment']."]>\n";
                     	$postfix = "{$indent}<![endif]-->\n";
                     	unset($link['comment']);
                     }                   	
@@ -855,14 +836,14 @@ class SmartyDocType extends Smarty
                     if (!(substr($src, 0, 1) == '/' || substr($src, 0, 7) == 'http://')) {
                         $src = $smarty->doc_script_url . $src;
                     }
-                    $doc_source .= "{$indent}<script";
+                    $doc_end .= "{$indent}<script";
                     unset($link['src']);
                     foreach ($link as $a=>$v) {
                         if (!empty($v)) {
-                            $doc_source .= " {$a}=\"{$v}\"";
+                            $doc_end .= " {$a}=\"{$v}\"";
                         }
                     }
-                    $doc_source .= " src=\"{$src}\"></script>\n".$postfix;
+                    $doc_end .= " src=\"{$src}\"></script>\n".$postfix;
                 }
             }
 
@@ -903,7 +884,6 @@ class SmartyDocType extends Smarty
             // insert module header-pre content
             $doc_source .= $module_content['head_post'];
 
-
             // process 'body' doc info
             $doc_source .= "</head>\n<body";
             if (isset($_doc_info['body'])) {
@@ -932,6 +912,8 @@ class SmartyDocType extends Smarty
 
             // insert module header-pre content
             $doc_source .= $module_content['body_post'];
+
+            $doc_source .= $doc_end;
 
             // y'all come back now, y'hear?
             $doc_source .= "</body>\n</html>";
