@@ -9,7 +9,7 @@
  * @copyright  (c) 2011 Mr Anchovy
  * @license    http://kohanaframework.org/license
  */
-class View extends Kohana_View
+class View extends Kohana_Kohana_View
 {
 
     public static $_smarty_is_loaded;
