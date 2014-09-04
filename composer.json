@@ -1,0 +1,24 @@
+{
+    "name": "pridemon/Kohana_Smarty3",
+    "type":        "kohana-module",
+    "description": "This is a module for the [Kohana PHP framework](http://kohanaphp.com/) that integrates the [Smarty Template Engine](http://www.smarty.net/)",
+    "license":     "BSD-3-Clause",
+    "require": {
+        "composer/installers": "~1.0",
+        "kohana/core":         ">=3.3",
+        "php":                 ">=5.3.3"
+    },
+    "repositories"			:[
+
+        {
+            "type":"git",
+            "url":"https://github.com/pridemon/Kohana_Smarty3.git"
+        }
+    ],
+    "authors": [
+        {
+            "name": "Ilya Gudkov",
+            "email": "pridemon@yandex.ru"
+        }
+    ]
+}
