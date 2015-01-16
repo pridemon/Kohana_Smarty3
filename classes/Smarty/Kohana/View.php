@@ -264,10 +264,11 @@ class Smarty_Kohana_View extends Kohana_View
 
             // locate Smarty.class.php
             if (!($file = $config->smarty_class_file)) {
-                $file = Kohana::find_file('vendor', 'smarty/libs/Smarty.class');
+                $file = realpath(APPPATH. '/../vendor/smarty/smarty/libs/Smarty.class.php');
             }
-            require_once($file);
 
+            require_once($file);
+            
             // save the location in case we have more than one Smarty version around
             self::$_smarty_path = realpath(dirname($file)) . DIRECTORY_SEPARATOR;
 
