@@ -268,7 +268,7 @@ class Smarty_Kohana_View extends Kohana_View
             }
 
             require_once($file);
-            
+
             // save the location in case we have more than one Smarty version around
             self::$_smarty_path = realpath(dirname($file)) . DIRECTORY_SEPARATOR;
 
